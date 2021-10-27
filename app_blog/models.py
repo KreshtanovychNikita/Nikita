@@ -8,24 +8,29 @@ from django.urls import reverse
 from django.db import models
 
 
-class Product(models.Model):
-    title = models.CharField(max_length=256, blank=False,
-                             verbose_name="Product Title")
-    price = models.IntegerField(blank=False, default=0,
-                                verbose_name="Product Price")
-
-
+# class Product(models.Model):
+#     title = models.CharField(max_length=256, blank=False,
+#                              verbose_name="Product Title")
+#     price = models.IntegerField(blank=False, default=0,
+#                                 verbose_name="Product Price")
 class Category(models.Model):
-    category = models.CharField(u'Категорія',
-                                max_length=250, help_text=u'Максимум 250 символів')
+    category = models.CharField(u'Категорія', max_length=250, help_text=u'Максимум 250 символів')
     slug = models.SlugField(u'Слаг')
+    objects = models.Manager()
 
     class Meta:
         verbose_name = u'Категорія для публікації'
         verbose_name_plural = u'Категорії для публікацій'
 
-        def __str__(self):
-            return self.category
+    def __str__(self):
+        return self.category
+
+    def get_absolute_url(self):
+        try:
+            url = reverse('articles-category-list', kwargs={'slug': self.category})
+        except:
+            url = "/"
+        return url
 
 
 class Article(models.Model):
@@ -42,9 +47,6 @@ class Article(models.Model):
     category = models.ForeignKey(Category,
                                  related_name='articles', blank=True, null=True,
                                  verbose_name=u'Категорія', on_delete=models.CASCADE)
-
-    category = models.ForeignKey(Category, related_name='news', blank=True, null=True, verbose_name=u'Категорія',
-                                 on_delete=models.CASCADE)
 
     objects = models.Manager()
 
